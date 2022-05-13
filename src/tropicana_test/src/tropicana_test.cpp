@@ -1,4 +1,3 @@
-
 #include "tropicana_test.h"
 #include <math.h>
 #include <stdlib.h>
@@ -14,10 +13,8 @@ float object_z = 0;
 enum
 {
     INIT_POSITION,
-    MOVE_ARM_TO_PICK,
-    GRIPPER_CLOSE,
+    MOVE_ARM_TO_CUT,
     MOVE_ARM_TO_PLACE,
-    END_POSITION,
     FINISH,
 };
 
@@ -32,9 +29,7 @@ TROPICANA_TEST::TROPICANA_TEST()
 
     ROS_INFO("Tropicana_test initialization");
     flag = false;
-
 }
-
 TROPICANA_TEST::~TROPICANA_TEST()
 {
     if (ros::isStarted())
@@ -91,9 +86,9 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
 {
   //ROS_INFO("SAVE POSE OF centroidPoseArray");
 
-    if (task == MOVE_ARM_TO_PICK)
+    if (task == MOVE_ARM_TO_CUT)
     {
-//if( 1 == 1 ) {
+    //if( 1 == 1 ) {
 
     /*float x_offset = 0.07;
     float y_offset = -0.015;
@@ -124,11 +119,11 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
                 ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x, object_y, object_z, centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
 
                 //centroid_pose_size = centroid_pose_size + 1;	
-          //task = MOVE_ARM_TO_PICK;
+                //task = MOVE_ARM_TO_CUT;
             }
             else
             {
-                task = END_POSITION;
+                task = INIT_POSITION;
             }
                 // if( centroid_pose_size >= 10){
                 // 	break ;
@@ -212,7 +207,7 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
 }
 
 
-void TROPICANA_TEST::gripper_open()
+void TROPICANA_TEST::cutter_open()
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(0.01);
@@ -223,20 +218,21 @@ void TROPICANA_TEST::gripper_open()
         return;
     }
 
-    ROS_INFO("Send gripper open");
+    ROS_INFO("Send cutter open");
 }
 
-void TROPICANA_TEST::gripper_close()
+void TROPICANA_TEST::cutter_close()
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(-0.01);
+
     if (!TROPICANA_TEST::setToolControl(joint_angle))
     {
         ROS_INFO("[ERR!!] Failed to send service");
         return;
     }
-    ROS_INFO("Send gripper close");
-    //writeLog("Send gripper close");
+
+    ROS_INFO("Send cutter close");
 }
 
 // void TROPICANA_TEST::objectPublisher(void)
@@ -247,42 +243,24 @@ void TROPICANA_TEST::gripper_close()
 //   //ROS_INFO("send objectPublisher %s ", target_object.c_str());
 // }
 
-void TROPICANA_TEST::home_pose(void)
+void TROPICANA_TEST::init_pose(void)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
-    double path_time = 2.0;
+    double path_time = 4.0;
 
     joint_name.push_back("joint1"); joint_angle.push_back(0.000);  //0.000
     joint_name.push_back("joint2"); joint_angle.push_back(-1.050); //-1.050
     joint_name.push_back("joint3"); joint_angle.push_back(0.350);  //0.350
     joint_name.push_back("joint4"); joint_angle.push_back(0.700);  //0.700
-    gripper_open();
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
         return;
     }
-    ROS_INFO("Send joint angle to home pose");
-}
+    ROS_INFO("Send joint angle to init pose");
 
-void TROPICANA_TEST::init_pose(void)
-{
-    std::vector<std::string> joint_name;
-    std::vector<double> joint_angle;
-    double path_time = 2.0;
-
-    joint_name.push_back("joint1"); joint_angle.push_back(0.210);  //0.000
-    joint_name.push_back("joint2"); joint_angle.push_back(0.000); //-1.050
-    joint_name.push_back("joint3"); joint_angle.push_back(-0.002);  //0.350
-    joint_name.push_back("joint4"); joint_angle.push_back(-0.002);  //0.700
-    gripper_open();
-    if (!setJointSpacePath(joint_name, joint_angle, path_time))
-    {
-        ROS_INFO("[ERR!!] Failed to send service");
-        return;
-    }
-    ROS_INFO("Send joint angle to home pose");
+    sleep(path_time);
 }
 
 void TROPICANA_TEST::place_pose(void)
@@ -291,16 +269,38 @@ void TROPICANA_TEST::place_pose(void)
     std::vector<double> joint_angle;
     double path_time = 4.0;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(1.507);  //각 joint variable 정해야함
-    joint_name.push_back("joint2"); joint_angle.push_back(0.000);
-    joint_name.push_back("joint3"); joint_angle.push_back(0.200);
-    joint_name.push_back("joint4"); joint_angle.push_back(0.800);
+    joint_name.push_back("joint1"); joint_angle.push_back(2.500);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.192);
+    joint_name.push_back("joint3"); joint_angle.push_back(1.135);
+    joint_name.push_back("joint4"); joint_angle.push_back(-1.045);
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
         return;
     }
     ROS_INFO("Send joint angle to place pose");
+
+    sleep(path_time);
+}
+
+void TROPICANA_TEST::drop_pose(void)
+{
+    std::vector<std::string> joint_name;
+    std::vector<double> joint_angle;
+    double path_time = 2.0;
+
+    joint_name.push_back("joint1"); joint_angle.push_back(2.500);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.192);
+    joint_name.push_back("joint3"); joint_angle.push_back(1.135);
+    joint_name.push_back("joint4"); joint_angle.push_back(-0.451);
+    if (!setJointSpacePath(joint_name, joint_angle, path_time))
+    {
+        ROS_INFO("[ERR!!] Failed to send service");
+        return;
+    }
+    ROS_INFO("Send joint angle to drop pose");
+
+    sleep(path_time);
 }
 
 void TROPICANA_TEST::process(void)
@@ -308,12 +308,12 @@ void TROPICANA_TEST::process(void)
     switch (task)
     {
         case INIT_POSITION:
-            home_pose();
-            task = MOVE_ARM_TO_PICK;
-            sleep(2);
+            cutter_open();
+            init_pose();
+            task = MOVE_ARM_TO_CUT;
             break;
 
-        case MOVE_ARM_TO_PICK:
+        case MOVE_ARM_TO_CUT:
           //object_x = object_x - 0.16 ;
           // ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
             // goalPose.at(0) = object_x ;//x
@@ -323,34 +323,22 @@ void TROPICANA_TEST::process(void)
           // {
           //   task = INIT_POSITION;
           //   break;
-            goalPose.at(0) = 0.130;//x
-            goalPose.at(1) = 0.000; //y
-            goalPose.at(2) = 0.270; //z
+            goalPose.at(0) = 0.196;//x
+            goalPose.at(1) = -0.140; //y
+            goalPose.at(2) = 0.228; //z
             setTaskSpacePath(goalPose, 3);
-            sleep(4);
-            task = GRIPPER_CLOSE;
-            break;
-
-        case GRIPPER_CLOSE:
-            gripper_close();
+            sleep(3);
+            cutter_close();
+            sleep(2);
+            cutter_open();
+            sleep(2);
             task = MOVE_ARM_TO_PLACE;
             break;
 
         case MOVE_ARM_TO_PLACE:
             place_pose();
-            sleep(5);
-            gripper_open();
-            sleep(3);
-            task = END_POSITION;
-            break;
-
-        case END_POSITION:
-            home_pose();
-            sleep(2);
-            task = FINISH;
-            break;
-
-        case FINISH:
+            drop_pose();
+            task = INIT_POSITION;
             break;
 
         default:
@@ -362,13 +350,11 @@ void TROPICANA_TEST::process(void)
 int main(int argc, char **argv)
 {
   // Init ROS node
-    ros::init(argc, argv, "TROPICANA_TEST_test start");
+    ros::init(argc, argv, "TROPICANA_TEST start");
     ros::NodeHandle priv_nh("~");
 
     TROPICANA_TEST tropicana_test_;
     tropicana_test_.goalPose = tropicana_test_.getPresentKinematicsPose();
-    // tropicana_test_.home_pose();
-    // sleep(2);
     // tropicana_test_.init_pose();
     // sleep(2);
     // tropicana_test_.goalPose.at(0) = 0.100 ;//x
@@ -381,20 +367,29 @@ int main(int argc, char **argv)
     // tropicana_test_.gripper_open();
 
     ros::Rate loop_rate(25);
-    task = INIT_POSITION;
 
     while (ros::ok())
     {
         ros::spinOnce();
-        tropicana_test_.process();
         loop_rate.sleep();
-        if (task == FINISH)
-        {
-            task = INIT_POSITION;
-        }
-        ROS_INFO("task : %d", task);
-    }
-    ROS_INFO("tropicana_test finish");
-    return 0;
 
+        // ROS_INFO("task : %d", task);
+        switch (task)
+        {
+            case INIT_POSITION:
+                ROS_INFO("task : INIT_POSITION");
+                break;
+            case MOVE_ARM_TO_CUT:
+                ROS_INFO("task : MOVE_ARM_TO_CUT");
+                break;
+            case MOVE_ARM_TO_PLACE:
+                ROS_INFO("task : MOVE_ARM_TO_PLACE");
+                break;
+        }
+
+        tropicana_test_.process();
+    }
+
+    ROS_INFO("TROPICANA_TEST finished");
+    return 0;
 }
