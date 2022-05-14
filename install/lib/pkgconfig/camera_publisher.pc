@@ -1,8 +1,0 @@
-prefix=/home/shkwon98/tropicana_ws/install
-
-Name: camera_publisher
-Description: Description of camera_publisher
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
