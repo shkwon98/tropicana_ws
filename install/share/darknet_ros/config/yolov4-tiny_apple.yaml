@@ -1,0 +1,12 @@
+yolo_model:
+
+  config_file:
+    name: yolov4-tiny_apple.cfg
+  weight_file:
+    name: yolov4-tiny_apple_best(dec).weights
+  threshold:
+    value: 0.25
+  detection_classes:
+    names:
+      - red apple
+      - green apple

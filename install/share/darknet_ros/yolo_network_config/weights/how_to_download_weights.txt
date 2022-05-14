@@ -1,0 +1,18 @@
+cd catkin_workspace/src/darknet_ros/darknet_ros/yolo_network_config/weights/
+
+COCO data set (Yolo v2):
+  wget http://pjreddie.com/media/files/yolov2.weights
+  wget http://pjreddie.com/media/files/yolov2-tiny.weights
+
+VOC data set (Yolo v2):
+  wget http://pjreddie.com/media/files/yolov2-voc.weights
+  wget http://pjreddie.com/media/files/yolov2-tiny-voc.weights
+
+Yolo v3:
+  wget http://pjreddie.com/media/files/yolov3.weights
+  wget http://pjreddie.com/media/files/yolov3-voc.weights
+
+COCO data set (Yolo v4)
+
+  wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
+  wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights

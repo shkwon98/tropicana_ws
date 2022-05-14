@@ -1,3 +1,6 @@
 [submodule "src/detection-3d-ros"]
 	path = src/detection-3d-ros
 	url = https://github.com/ssh199898/detection-3d-ros
+[submodule "src/darknet_ros"]
+	path = src/darknet_ros
+	url = https://github.com/ssh199898/darknet_ros
