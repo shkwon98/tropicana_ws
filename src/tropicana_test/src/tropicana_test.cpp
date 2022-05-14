@@ -196,7 +196,7 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
     srv.request.kinematics_pose.pose.orientation.z = kinematics_pose_.pose.orientation.z;
 
     ROS_INFO("-- x( %.3lf, %.3lf) y( %.3lf, %.3lf) z( %.3lf, %.3lf) \n", kinematics_pose.at(0), srv.request.kinematics_pose.pose.position.x,
-           kinematics_pose.at(1), srv.request.kinematics_pose.pose.position.y, kinematics_pose.at(2), srv.request.kinematics_pose.pose.position.z);
+            kinematics_pose.at(1), srv.request.kinematics_pose.pose.position.y, kinematics_pose.at(2), srv.request.kinematics_pose.pose.position.z);
     srv.request.path_time = path_time;
 
     if (goal_task_space_path_position_only_client_.call(srv))
@@ -251,8 +251,8 @@ void TROPICANA_TEST::init_pose(void)
 
     joint_name.push_back("joint1"); joint_angle.push_back(0.000);  //0.000
     joint_name.push_back("joint2"); joint_angle.push_back(-1.050); //-1.050
-    joint_name.push_back("joint3"); joint_angle.push_back(0.350);  //0.350
-    joint_name.push_back("joint4"); joint_angle.push_back(0.700);  //0.700
+    joint_name.push_back("joint3"); joint_angle.push_back(0.365);  //0.365
+    joint_name.push_back("joint4"); joint_angle.push_back(0.600);  //0.600
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
@@ -269,10 +269,10 @@ void TROPICANA_TEST::place_pose(void)
     std::vector<double> joint_angle;
     double path_time = 4.0;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(2.500);
-    joint_name.push_back("joint2"); joint_angle.push_back(-0.192);
-    joint_name.push_back("joint3"); joint_angle.push_back(1.135);
-    joint_name.push_back("joint4"); joint_angle.push_back(-1.045);
+    joint_name.push_back("joint1"); joint_angle.push_back(-2.651);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.529);
+    joint_name.push_back("joint3"); joint_angle.push_back(0.729);
+    joint_name.push_back("joint4"); joint_angle.push_back(-0.377);
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
@@ -289,10 +289,10 @@ void TROPICANA_TEST::drop_pose(void)
     std::vector<double> joint_angle;
     double path_time = 2.0;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(2.500);
-    joint_name.push_back("joint2"); joint_angle.push_back(-0.192);
-    joint_name.push_back("joint3"); joint_angle.push_back(1.135);
-    joint_name.push_back("joint4"); joint_angle.push_back(-0.451);
+    joint_name.push_back("joint1"); joint_angle.push_back(-2.651);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.529);
+    joint_name.push_back("joint3"); joint_angle.push_back(0.729);
+    joint_name.push_back("joint4"); joint_angle.push_back(0.310);
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
@@ -323,9 +323,9 @@ void TROPICANA_TEST::process(void)
           // {
           //   task = INIT_POSITION;
           //   break;
-            goalPose.at(0) = 0.196;//x
-            goalPose.at(1) = -0.140; //y
-            goalPose.at(2) = 0.228; //z
+            goalPose.at(0) = 0.146;//x
+            goalPose.at(1) = 0.129; //y
+            goalPose.at(2) = 0.282; //z
             setTaskSpacePath(goalPose, 3);
             sleep(3);
             cutter_close();
