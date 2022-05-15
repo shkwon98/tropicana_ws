@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 using namespace tropicana_test;
-int centroid_pose_size = 0;
-uint8_t task = 0, pre_task = 0;
+//int centroid_pose_size = 0;
+uint8_t task = 0;
 std::vector<float> object_x;
 std::vector<float> object_y;
 std::vector<float> object_z;
@@ -82,7 +82,7 @@ void TROPICANA_TEST::kinematicsPoseCallback(const open_manipulator_msgs::Kinemat
     kinematics_pose_.pose = msg->pose;
 }
 
-void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray::ConstPtr &msg)
+void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 {
   //ROS_INFO("SAVE POSE OF centroidPoseArray");
 
@@ -102,7 +102,7 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
         geometry_msgs::Pose centroid_pose;
         ROS_INFO("const float defined");
 
-        if (msg->boxes.size() == 0)
+        if (msg->detections.size() == 0)
         {
             task = INIT_POSITION;
             //모바일 로봇 전진
@@ -111,11 +111,11 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
         }
         else
         {
-            for (int i = 0; i < msg->boxes.size(); i++)
+            for (int i = 0; i < msg->detections.size(); i++)
             {
-                if (!((msg->boxes[i].center.position.x == 0) && (msg->boxes[i].center.position.y == 0) && (msg->boxes[i].center.position.z == 0)))
+                if (!((msg->detections.at(i).bbox.center.position.x == 0) && (msg->detections.at(i).bbox.center.position.y == 0) && (msg->detections.at(i).bbox.center.position.z == 0)))
                 {
-                    centroid_pose = msg->boxes[i].center;
+                    centroid_pose = msg->detections.at(i).bbox.center;
                     object_x.push_back(cos(theta) * centroid_pose.position.x - sin(theta) * centroid_pose.position.z);
                     object_y.push_back(centroid_pose.position.y + y_offset);
                     object_z.push_back(sin(theta) * centroid_pose.position.x + cos(theta) * centroid_pose.position.z + z_offset + cut_height);

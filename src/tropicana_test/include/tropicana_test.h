@@ -8,10 +8,10 @@
 #include "open_manipulator_msgs/SetJointPosition.h"
 #include "open_manipulator_msgs/SetKinematicsPose.h"
 
-#include "geometry_msgs/PoseStamped.h"
+#include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
 #include <std_msgs/String.h>
-#include "vision_msgs/BoundingBox3DArray.h"
+#include <vision_msgs/Detection3DArray.h>
 
 #define NUM_OF_JOINT 4
 
@@ -50,7 +50,7 @@ namespace tropicana_test
 
         void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
         void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg);
-        void centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray::ConstPtr &msg);
+        void centroidPoseArrayMsgCallback(const vision_msgs::Detection3DArray::ConstPtr &msg);
 
         std::vector<double> getPresentJointAngle();
         std::vector<double> getPresentKinematicsPose();
