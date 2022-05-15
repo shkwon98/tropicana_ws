@@ -97,6 +97,7 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
         const float x_offset = 0.0;     //단위 : 미터
         const float y_offset = 0.1;
         const float z_offset = 0.02;
+        const float cut_height = 0.05;
         const float pi = 3.1415926;
         const float theta = 30 * pi / 180; //각도 측정 필요
 
@@ -116,7 +117,7 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
 
                 object_x.push_back(cos(theta) * centroid_pose[i].position.x - sin(theta) * centroid_pose[i].position.z);
                 object_y.push_back(centroid_pose[i].position.y + y_offset);
-                object_z.push_back(sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset);
+                object_z.push_back(sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset + cut_height);
 
                 ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x[i], object_y[i], object_z[i], centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
 
@@ -212,7 +213,7 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
 void TROPICANA_TEST::cutter_open()
 {
     std::vector<double> joint_angle;
-    joint_angle.push_back(0.01);
+    joint_angle.push_back(0.006);
 
     if (!TROPICANA_TEST::setToolControl(joint_angle))
     {
@@ -226,7 +227,7 @@ void TROPICANA_TEST::cutter_open()
 void TROPICANA_TEST::cutter_close()
 {
     std::vector<double> joint_angle;
-    joint_angle.push_back(-0.01);
+    joint_angle.push_back(0.003);
 
     if (!TROPICANA_TEST::setToolControl(joint_angle))
     {
@@ -271,10 +272,10 @@ void TROPICANA_TEST::place_pose(void)
     std::vector<double> joint_angle;
     double path_time = 4.0;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(-2.651);
-    joint_name.push_back("joint2"); joint_angle.push_back(-0.529);
-    joint_name.push_back("joint3"); joint_angle.push_back(0.729);
-    joint_name.push_back("joint4"); joint_angle.push_back(-0.377);
+    joint_name.push_back("joint1"); joint_angle.push_back(-2.605);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.695);
+    joint_name.push_back("joint3"); joint_angle.push_back(0.293);
+    joint_name.push_back("joint4"); joint_angle.push_back(0.199);
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
@@ -291,10 +292,10 @@ void TROPICANA_TEST::drop_pose(void)
     std::vector<double> joint_angle;
     double path_time = 2.0;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(-2.651);
-    joint_name.push_back("joint2"); joint_angle.push_back(-0.529);
-    joint_name.push_back("joint3"); joint_angle.push_back(0.729);
-    joint_name.push_back("joint4"); joint_angle.push_back(0.310);
+    joint_name.push_back("joint1"); joint_angle.push_back(-2.605);
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.695);
+    joint_name.push_back("joint3"); joint_angle.push_back(0.293);
+    joint_name.push_back("joint4"); joint_angle.push_back(1.049);
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
         ROS_INFO("[ERR!!] Failed to send service");
