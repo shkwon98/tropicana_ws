@@ -253,9 +253,9 @@ void TROPICANA_TEST::init_pose(double path_time)
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
 
-    joint_name.push_back("joint1"); joint_angle.push_back(0.000);  //0.000
-    joint_name.push_back("joint2"); joint_angle.push_back(-1.050); //-1.050
-    joint_name.push_back("joint3"); joint_angle.push_back(0.365);  //0.365
+    joint_name.push_back("joint1"); joint_angle.push_back(0.044);  //0.000
+    joint_name.push_back("joint2"); joint_angle.push_back(-0.617); //-1.050
+    joint_name.push_back("joint3"); joint_angle.push_back(-0.344);  //0.365
     joint_name.push_back("joint4"); joint_angle.push_back(0.600);  //0.600
     if (!setJointSpacePath(joint_name, joint_angle, path_time))
     {
