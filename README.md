@@ -12,15 +12,6 @@ catkin_make --only-pkg-with-deps realsense2_camera -DCATKIN_ENABLE_TESTING=False
 catkin_make install --only-pkg-with-deps realsense2_camera 
 ```
 
-2. Config realsense camera
 
-```
-rosrun rqt_reconfigure rqt_reconfigure
-```
-- motion_module -> reduce `frames_queue_size` to 2 
-- pointcloud -> reduce `frames_queue_size` to 2
-- pointcloud -> change `stream_filter` to `ANY`
-- rgb_camera -> reduce `frames_queue_size` to 2
-- stereo_module -> reduce `frames_queue_size` to 2
-
-** Checkout `rs_point_dynamic_cfg.yaml` **
+Weight link
+https://drive.google.com/file/d/1bHv0m8gmSKZaaGunBOCxpNtLa6o1CDAp/view?usp=sharing
