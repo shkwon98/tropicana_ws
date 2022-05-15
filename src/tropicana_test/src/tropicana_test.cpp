@@ -117,7 +117,7 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
                 object_y.push_back(centroid_pose[i].position.y + y_offset);
                 object_z.push_back(sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset);
 
-                ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x, object_y, object_z, centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
+                ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x[i], object_y[i], object_z[i], centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
 
                 //centroid_pose_size = centroid_pose_size + 1;	
                 //task = MOVE_ARM_TO_CUT;
@@ -315,8 +315,8 @@ void TROPICANA_TEST::process(void)
             break;
 
         case MOVE_ARM_TO_CUT:
-            object_x = object_x - 0.16 ;
-            ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
+            //object_x = object_x - 0.16 ;
+            //ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
             goalPose.at(0) = object_x[0] ;//x
             goalPose.at(1) = object_y[0]; //y
             goalPose.at(2) = object_z[0] ; //z
