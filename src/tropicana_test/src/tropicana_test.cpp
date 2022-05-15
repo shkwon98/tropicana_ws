@@ -207,10 +207,11 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
         return srv.response.is_planned;
     }
     return false;
+    sleep(path_time);
 }
 
 
-void TROPICANA_TEST::cutter_open()
+void TROPICANA_TEST::cutter_open(double path_time)
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(0.006);
@@ -222,9 +223,10 @@ void TROPICANA_TEST::cutter_open()
     }
 
     ROS_INFO("Send cutter open");
+    sleep(path_time);
 }
 
-void TROPICANA_TEST::cutter_close()
+void TROPICANA_TEST::cutter_close(double path_time)
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(0.003);
@@ -236,6 +238,7 @@ void TROPICANA_TEST::cutter_close()
     }
 
     ROS_INFO("Send cutter close");
+    sleep(path_time);
 }
 
 // void TROPICANA_TEST::objectPublisher(void)
@@ -246,11 +249,10 @@ void TROPICANA_TEST::cutter_close()
 //   //ROS_INFO("send objectPublisher %s ", target_object.c_str());
 // }
 
-void TROPICANA_TEST::init_pose(void)
+void TROPICANA_TEST::init_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
-    double path_time = 4.0;
 
     joint_name.push_back("joint1"); joint_angle.push_back(0.000);  //0.000
     joint_name.push_back("joint2"); joint_angle.push_back(-1.050); //-1.050
@@ -266,11 +268,10 @@ void TROPICANA_TEST::init_pose(void)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::place_pose(void)
+void TROPICANA_TEST::place_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
-    double path_time = 4.0;
 
     joint_name.push_back("joint1"); joint_angle.push_back(-2.605);
     joint_name.push_back("joint2"); joint_angle.push_back(-0.695);
@@ -286,11 +287,10 @@ void TROPICANA_TEST::place_pose(void)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::drop_pose(void)
+void TROPICANA_TEST::drop_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
-    double path_time = 2.0;
 
     joint_name.push_back("joint1"); joint_angle.push_back(-2.605);
     joint_name.push_back("joint2"); joint_angle.push_back(-0.695);
@@ -311,8 +311,8 @@ void TROPICANA_TEST::process(void)
     switch (task)
     {
         case INIT_POSITION:
-            cutter_open();
-            init_pose();
+            cutter_open(2);
+            init_pose(4);
             task = MOVE_ARM_TO_CUT;
             break;
 
@@ -331,17 +331,15 @@ void TROPICANA_TEST::process(void)
             // goalPose.at(1) = 0.129; //y
             // goalPose.at(2) = 0.282; //z
             setTaskSpacePath(goalPose, 3);
-            sleep(3);
-            cutter_close();
-            sleep(2);
-            cutter_open();
-            sleep(2);
+            cutter_close(2);
+            cutter_open(2);
             task = MOVE_ARM_TO_PLACE;
             break;
 
         case MOVE_ARM_TO_PLACE:
-            place_pose();
-            drop_pose();
+            place_pose(4);
+            drop_pose(2);
+            place_pose(2);
             task = INIT_POSITION;
             break;
 

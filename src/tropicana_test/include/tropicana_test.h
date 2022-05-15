@@ -62,14 +62,14 @@ namespace tropicana_test
         void setGoal();
 
       //  bool setToolControl(std::vector<double> joint_angle);
-        void cutter_open(void);
-        void cutter_close(void);
+        void cutter_open(double);
+        void cutter_close(double);
 
         void objectPublisher(void);
         void process(void);
-        void init_pose(void);
-        void place_pose(void);
-        void drop_pose(void);
+        void init_pose(double);
+        void place_pose(double);
+        void drop_pose(double);
     };
 }
 
