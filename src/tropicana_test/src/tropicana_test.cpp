@@ -6,9 +6,10 @@ using namespace tropicana_test;
 geometry_msgs::Pose centroid_pose[10];
 int centroid_pose_size = 0;
 uint8_t task = 0, pre_task = 0;
-float object_x = 0;
-float object_y = 0;
-float object_z = 0;
+std::vector<float> object_x;
+std::vector<float> object_y;
+std::vector<float> object_z;
+
 
 enum
 {
@@ -112,11 +113,11 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
             {
                 centroid_pose[i] = msg.boxes[i].center;
 
-                object_x = cos(theta) * centroid_pose[i].position.x - sin(theta) * centroid_pose[i].position.z;
-                object_y = centroid_pose[i].position.y + y_offset;
-                object_z = sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset;
+                object_x.push_back(cos(theta) * centroid_pose[i].position.x - sin(theta) * centroid_pose[i].position.z);
+                object_y.push_back(centroid_pose[i].position.y + y_offset);
+                object_z.push_back(sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset);
 
-                ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x, object_y, object_z, centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
+                ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x[i], object_y[i], object_z[i], centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
 
                 //centroid_pose_size = centroid_pose_size + 1;	
                 //task = MOVE_ARM_TO_CUT;
@@ -314,18 +315,19 @@ void TROPICANA_TEST::process(void)
             break;
 
         case MOVE_ARM_TO_CUT:
-          //object_x = object_x - 0.16 ;
-          // ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
-            // goalPose.at(0) = object_x ;//x
-          // goalPose.at(1) = object_y; //y
-          // goalPose.at(2) = object_z ; //z
-          // if(!setTaskSpacePath(goalPose, 2))
-          // {
-          //   task = INIT_POSITION;
-          //   break;
-            goalPose.at(0) = 0.146;//x
-            goalPose.at(1) = 0.129; //y
-            goalPose.at(2) = 0.282; //z
+            //object_x = object_x - 0.16 ;
+            //ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
+            goalPose.at(0) = object_x[0] ;//x
+            goalPose.at(1) = object_y[0]; //y
+            goalPose.at(2) = object_z[0] ; //z
+            if(!setTaskSpacePath(goalPose, 2))
+            {
+                task = INIT_POSITION;
+                break;
+            }
+            // goalPose.at(0) = 0.146;//x
+            // goalPose.at(1) = 0.129; //y
+            // goalPose.at(2) = 0.282; //z
             setTaskSpacePath(goalPose, 3);
             sleep(3);
             cutter_close();
