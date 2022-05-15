@@ -16,7 +16,7 @@ enum
     INIT_POSITION,
     MOVE_ARM_TO_CUT,
     MOVE_ARM_TO_PLACE,
-    FINISH,
+    RETURN_POSITION,
 };
 
 TROPICANA_TEST::TROPICANA_TEST()
@@ -207,7 +207,6 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
         return srv.response.is_planned;
     }
     return false;
-    sleep(path_time);
 }
 
 
@@ -311,7 +310,7 @@ void TROPICANA_TEST::process(void)
     switch (task)
     {
         case INIT_POSITION:
-            cutter_open(2);
+            cutter_open(1);
             init_pose(4);
             task = MOVE_ARM_TO_CUT;
             break;
@@ -334,8 +333,9 @@ void TROPICANA_TEST::process(void)
             goalPose.at(2) = 0.282; //z
 
             setTaskSpacePath(goalPose, 3);
-            cutter_close(2);
-            cutter_open(2);
+            sleep(3);
+            cutter_close(1);
+            cutter_open(1);
             task = MOVE_ARM_TO_PLACE;
             break;
 
@@ -343,7 +343,12 @@ void TROPICANA_TEST::process(void)
             place_pose(4);
             drop_pose(2);
             place_pose(2);
-            task = INIT_POSITION;
+            task = RETURN_POSITION;
+            break;
+
+        case RETURN_POSITION:
+            init_pose(4);
+            task = MOVE_ARM_TO_CUT;
             break;
 
         default:
@@ -389,6 +394,9 @@ int main(int argc, char **argv)
                 break;
             case MOVE_ARM_TO_PLACE:
                 ROS_INFO("task : MOVE_ARM_TO_PLACE");
+                break;
+            case RETURN_POSITION:
+                ROS_INFO("task : RETURN_POSITION");
                 break;
         }
 
