@@ -104,6 +104,7 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
         {
             centroid_pose_size = 0;
             task = INIT_POSITION;
+            //모바일 로봇 전진
             return;
         }
 
