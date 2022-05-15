@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 using namespace tropicana_test;
-geometry_msgs::Pose centroid_pose[10];
 int centroid_pose_size = 0;
 uint8_t task = 0, pre_task = 0;
 std::vector<float> object_x;
@@ -56,7 +55,7 @@ void TROPICANA_TEST::initSubscriber()
     chain_joint_states_sub_ = node_handle_.subscribe("/open_manipulator/joint_states", 10, &TROPICANA_TEST::jointStatesCallback, this);
     chain_kinematics_pose_sub_ = node_handle_.subscribe("/open_manipulator/kinematics_pose", 10, &TROPICANA_TEST::kinematicsPoseCallback, this);
 
-    centroid_pose_array_sub = node_handle_.subscribe("/centroid_pose_array", 10, &TROPICANA_TEST::centroidPoseArrayMsgCallback, this);
+    centroid_pose_array_sub = node_handle_.subscribe("/detection_3d/detection_3d", 10, &TROPICANA_TEST::centroidPoseArrayMsgCallback, this);
 }
 
 void TROPICANA_TEST::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
@@ -83,7 +82,7 @@ void TROPICANA_TEST::kinematicsPoseCallback(const open_manipulator_msgs::Kinemat
     kinematics_pose_.pose = msg->pose;
 }
 
-void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray &msg)
+void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray::ConstPtr &msg)
 {
   //ROS_INFO("SAVE POSE OF centroidPoseArray");
 
@@ -100,37 +99,40 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox
         const float cut_height = 0.05;
         const float pi = 3.1415926;
         const float theta = 30 * pi / 180; //각도 측정 필요
+        geometry_msgs::Pose centroid_pose;
+        ROS_INFO("const float defined");
 
-        if (msg.boxes.size() == 0)
+        if (msg->boxes.size() == 0)
         {
-            centroid_pose_size = 0;
             task = INIT_POSITION;
             //모바일 로봇 전진
             return;
+            ROS_INFO("if box size=0");
         }
-
-        for (int i = 0; i < msg.boxes.size(); i++)
+        else
         {
-            if (!((msg.boxes[i].center.position.x == 0) && (msg.boxes[i].center.position.y == 0) && (msg.boxes[i].center.position.z == 0)))
+            for (int i = 0; i < msg->boxes.size(); i++)
             {
-                centroid_pose[i] = msg.boxes[i].center;
+                if (!((msg->boxes[i].center.position.x == 0) && (msg->boxes[i].center.position.y == 0) && (msg->boxes[i].center.position.z == 0)))
+                {
+                    centroid_pose = msg->boxes[i].center;
+                    object_x.push_back(cos(theta) * centroid_pose.position.x - sin(theta) * centroid_pose.position.z);
+                    object_y.push_back(centroid_pose.position.y + y_offset);
+                    object_z.push_back(sin(theta) * centroid_pose.position.x + cos(theta) * centroid_pose.position.z + z_offset + cut_height);
 
-                object_x.push_back(cos(theta) * centroid_pose[i].position.x - sin(theta) * centroid_pose[i].position.z);
-                object_y.push_back(centroid_pose[i].position.y + y_offset);
-                object_z.push_back(sin(theta) * centroid_pose[i].position.x + cos(theta) * centroid_pose[i].position.z + z_offset + cut_height);
+                    ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x[i], object_y[i], object_z[i], centroid_pose.position.x, centroid_pose.position.y, centroid_pose.position.z);
 
-                ROS_INFO("coord %d _  %.3f, %.3f, %.3f _  %.3f, %.3f, %.3f  ", i, object_x[i], object_y[i], object_z[i], centroid_pose[i].position.x, centroid_pose[i].position.y, centroid_pose[i].position.z);
-
-                //centroid_pose_size = centroid_pose_size + 1;	
-                //task = MOVE_ARM_TO_CUT;
+                    //centroid_pose_size = centroid_pose_size + 1;	
+                    //task = MOVE_ARM_TO_CUT;
+                }
+                else
+                {
+                    task = INIT_POSITION;
+                }
+                    // if( centroid_pose_size >= 10){
+                    // 	break ;
+                    // }
             }
-            else
-            {
-                task = INIT_POSITION;
-            }
-                // if( centroid_pose_size >= 10){
-                // 	break ;
-                // }
         }
     }
     else
@@ -319,20 +321,20 @@ void TROPICANA_TEST::process(void)
             //object_x = object_x - 0.16 ;
             //ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
 
-            // goalPose.at(0) = object_x[0] ;//x
-            // goalPose.at(1) = object_y[0]; //y
-            // goalPose.at(2) = object_z[0] ; //z
-            // if(!setTaskSpacePath(goalPose, 2))
-            // {
-            //     task = INIT_POSITION;
-            //     break;
-            // }
+            goalPose.at(0) = object_x[0];//x
+            goalPose.at(1) = object_y[0]; //y
+            goalPose.at(2) = object_z[0]; //z
+            if (!setTaskSpacePath(goalPose, 2))
+            {
+                task = INIT_POSITION;
+                break;
+            }
 
-            goalPose.at(0) = 0.146;//x
-            goalPose.at(1) = 0.129; //y
-            goalPose.at(2) = 0.282; //z
+            // goalPose.at(0) = 0.146;//x
+            // goalPose.at(1) = 0.129; //y
+            // goalPose.at(2) = 0.282; //z
+            // setTaskSpacePath(goalPose, 3);
 
-            setTaskSpacePath(goalPose, 3);
             sleep(3);
             cutter_close(1);
             cutter_open(1);
@@ -360,7 +362,7 @@ void TROPICANA_TEST::process(void)
 int main(int argc, char **argv)
 {
   // Init ROS node
-    ros::init(argc, argv, "TROPICANA_TEST start");
+    ros::init(argc, argv, "TROPICANA_TEST");
     ros::NodeHandle priv_nh("~");
 
     TROPICANA_TEST tropicana_test_;

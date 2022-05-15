@@ -50,7 +50,7 @@ namespace tropicana_test
 
         void jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
         void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg);
-        void centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray &msg);
+        void centroidPoseArrayMsgCallback(const vision_msgs::BoundingBox3DArray::ConstPtr &msg);
 
         std::vector<double> getPresentJointAngle();
         std::vector<double> getPresentKinematicsPose();
