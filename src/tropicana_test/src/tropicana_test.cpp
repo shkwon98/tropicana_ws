@@ -319,17 +319,20 @@ void TROPICANA_TEST::process(void)
         case MOVE_ARM_TO_CUT:
             //object_x = object_x - 0.16 ;
             //ROS_INFO(" move %.3f, %.3f, %.3f ", object_x, object_y, object_z );
-            goalPose.at(0) = object_x[0] ;//x
-            goalPose.at(1) = object_y[0]; //y
-            goalPose.at(2) = object_z[0] ; //z
-            if(!setTaskSpacePath(goalPose, 2))
-            {
-                task = INIT_POSITION;
-                break;
-            }
-            // goalPose.at(0) = 0.146;//x
-            // goalPose.at(1) = 0.129; //y
-            // goalPose.at(2) = 0.282; //z
+
+            // goalPose.at(0) = object_x[0] ;//x
+            // goalPose.at(1) = object_y[0]; //y
+            // goalPose.at(2) = object_z[0] ; //z
+            // if(!setTaskSpacePath(goalPose, 2))
+            // {
+            //     task = INIT_POSITION;
+            //     break;
+            // }
+
+            goalPose.at(0) = 0.146;//x
+            goalPose.at(1) = 0.129; //y
+            goalPose.at(2) = 0.282; //z
+
             setTaskSpacePath(goalPose, 3);
             cutter_close(2);
             cutter_open(2);
