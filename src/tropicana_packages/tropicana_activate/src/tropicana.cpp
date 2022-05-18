@@ -1,8 +1,7 @@
-#include "tropicana_test.h"
-#include <math.h>
+#include "tropicana.h"
 #include <stdlib.h>
 
-using namespace tropicana_test;
+using namespace tropicana;
 //int centroid_pose_size = 0;
 uint8_t task = 0;
 std::vector<float> object_x;
@@ -18,7 +17,7 @@ enum
     RETURN_POSITION,
 };
 
-TROPICANA_TEST::TROPICANA_TEST()
+TROPICANA::TROPICANA()
     :node_handle_("")
 {
     present_joint_angle.resize(NUM_OF_JOINT);
@@ -27,10 +26,10 @@ TROPICANA_TEST::TROPICANA_TEST()
     initPublisher();
     initSubscriber();
 
-    ROS_INFO("Tropicana_test initialization");
+    ROS_INFO("TROPICANA initialization");
     flag = false;
 }
-TROPICANA_TEST::~TROPICANA_TEST()
+TROPICANA::~TROPICANA()
 {
     if (ros::isStarted())
     {
@@ -40,7 +39,7 @@ TROPICANA_TEST::~TROPICANA_TEST()
     //wait();
 }
 
-void TROPICANA_TEST::initPublisher()
+void TROPICANA::initPublisher()
 {
   // service client
     goal_joint_space_path_client_ = node_handle_.serviceClient<open_manipulator_msgs::SetJointPosition>("/open_manipulator/goal_joint_space_path");
@@ -49,16 +48,16 @@ void TROPICANA_TEST::initPublisher()
     //set_actuator_state_client_ = n.serviceClient<open_manipulator_msgs::SetActuatorState>("/open_manipulator/set_actuator_state");
     //goal_drawing_trajectory_client_ = n.serviceClient<open_manipulator_msgs::SetDrawingTrajectory>("/open_manipulator/goal_drawing_trajectory");
 }
-void TROPICANA_TEST::initSubscriber()
+void TROPICANA::initSubscriber()
 {
   //open_manipulator_states_sub_       = n.subscribe("/open_manipulator/states", 10, &QNode::statesCallback, this);
-    chain_joint_states_sub_ = node_handle_.subscribe("/open_manipulator/joint_states", 10, &TROPICANA_TEST::jointStatesCallback, this);
-    chain_kinematics_pose_sub_ = node_handle_.subscribe("/open_manipulator/kinematics_pose", 10, &TROPICANA_TEST::kinematicsPoseCallback, this);
+    chain_joint_states_sub_ = node_handle_.subscribe("/open_manipulator/joint_states", 10, &TROPICANA::jointStatesCallback, this);
+    chain_kinematics_pose_sub_ = node_handle_.subscribe("/open_manipulator/kinematics_pose", 10, &TROPICANA::kinematicsPoseCallback, this);
 
-    centroid_pose_array_sub = node_handle_.subscribe("/detection_3d/detection_3d", 1, &TROPICANA_TEST::centroidPoseArrayMsgCallback, this);
+    centroid_pose_array_sub = node_handle_.subscribe("/detection_3d/detection_3d", 1, &TROPICANA::centroidPoseArrayMsgCallback, this);
 }
 
-void TROPICANA_TEST::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
+void TROPICANA::jointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 {
     std::vector<double> temp_angle;
     temp_angle.resize(NUM_OF_JOINT);
@@ -72,7 +71,7 @@ void TROPICANA_TEST::jointStatesCallback(const sensor_msgs::JointState::ConstPtr
     present_joint_angle = temp_angle;
 }
 
-void TROPICANA_TEST::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
+void TROPICANA::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr &msg)
 {
     std::vector<double> temp_position;
     temp_position.push_back(msg->pose.position.x);
@@ -82,31 +81,17 @@ void TROPICANA_TEST::kinematicsPoseCallback(const open_manipulator_msgs::Kinemat
     kinematics_pose_.pose = msg->pose;
 }
 
-void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3DArray::ConstPtr &msg)
+void TROPICANA::centroidPoseArrayMsgCallback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 {
-  //ROS_INFO("SAVE POSE OF centroidPoseArray");
-
     if (task == MOVE_ARM_TO_CUT)
     {
-    //if( 1 == 1 ) {
-
-    /*float x_offset = 0.07;
-    float y_offset = -0.015;
-    float z_offset = 0.017;*/
-        const float x_offset = 0.0975;     //단위 : 미터
-        const float y_offset = 0.0075;
-        const float z_offset = 0.060;
-        const float cutter_height = 0.05;
-        const float pi = 3.1415926;
-        const float theta = 15.0 * pi / 180; //각도 측정 필요
-        // float phi = 0.0;
-        std::vector<float> temp_object_x;
-        std::vector<float> temp_object_y;
-        std::vector<float> temp_object_z;
-
         object_x.clear();
         object_y.clear();
         object_z.clear();
+
+        std::vector<float> temp_object_x;
+        std::vector<float> temp_object_y;
+        std::vector<float> temp_object_z;
         std::vector<std::vector<float>> two_D_vector;
 
         geometry_msgs::Pose centroid_pose;
@@ -115,7 +100,6 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3D
         if (msg->detections.size() == 0)
         {
             task = INIT_POSITION;
-            //모바일 로봇 전진
             return;
             ROS_INFO("if box size=0");
         }
@@ -125,12 +109,12 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3D
             {
                 if (!((msg->detections.at(i).bbox.center.position.x == 0) && (msg->detections.at(i).bbox.center.position.y == 0) && (msg->detections.at(i).bbox.center.position.z == 0)))
                 {
-
                     centroid_pose = msg->detections.at(i).bbox.center;
-                    temp_object_x.push_back(cos(theta) * centroid_pose.position.x - sin(theta) * centroid_pose.position.z + x_offset);
-                    temp_object_y.push_back((centroid_pose.position.y + y_offset) * 1.75);
-                    temp_object_z.push_back(sin(theta) * centroid_pose.position.x + cos(theta) * centroid_pose.position.z + z_offset + cutter_height);
-                    // phi = atan2(temp_object_y[i], temp_object_x[i]);
+
+                    // Target point with respect to manipulator coordinate
+                    temp_object_x.push_back(cos(rad_offset) * centroid_pose.position.x - sin(rad_offset) * centroid_pose.position.z + x_offset);
+                    temp_object_y.push_back((centroid_pose.position.y + y_offset) * y_gain);
+                    temp_object_z.push_back(sin(rad_offset) * centroid_pose.position.x + cos(rad_offset) * centroid_pose.position.z + z_offset + cutter_z_offset);
 
                     two_D_vector.push_back(std::vector<float>());
                     two_D_vector[i].push_back(temp_object_y[i]);
@@ -138,24 +122,18 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3D
                     two_D_vector[i].push_back(temp_object_z[i]);
                     sort(two_D_vector.begin(), two_D_vector.end());
 
-                    ROS_INFO("coord %d  before translation :  %.3f, %.3f, %.3f  ", i, centroid_pose.position.x, centroid_pose.position.y, centroid_pose.position.z);
-
-                    //centroid_pose_size = centroid_pose_size + 1;	
-                    //task = MOVE_ARM_TO_CUT;
+                    ROS_INFO("Target %d  Before transformation :  %.3f, %.3f, %.3f  ", i, centroid_pose.position.x, centroid_pose.position.y, centroid_pose.position.z);
                 }
                 else
                 {
                     task = INIT_POSITION;
                 }
-                    // if( centroid_pose_size >= 10){
-                    // 	break ;
-                    // }
             }
             object_x.push_back(two_D_vector[0][1]);
             object_y.push_back(two_D_vector[0][0]);
             object_z.push_back(two_D_vector[0][2]);
 
-            ROS_INFO("after transformation : %.3f, %.3f, %.3f  ", object_x[0], object_y[0], object_z[0]);
+            ROS_INFO("After transformation : %.3f, %.3f, %.3f  ", object_x[0], object_y[0], object_z[0]);
         }
     }
     else
@@ -165,16 +143,16 @@ void TROPICANA_TEST::centroidPoseArrayMsgCallback(const vision_msgs::Detection3D
 
 }
 
-std::vector<double> TROPICANA_TEST::getPresentJointAngle()
+std::vector<double> TROPICANA::getPresentJointAngle()
 {
     return present_joint_angle;
 }
-std::vector<double> TROPICANA_TEST::getPresentKinematicsPose()
+std::vector<double> TROPICANA::getPresentKinematicsPose()
 {
     return present_kinematic_position;
 }
 
-bool TROPICANA_TEST::setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time)
+bool TROPICANA::setJointSpacePath(std::vector<std::string> joint_name, std::vector<double> joint_angle, double path_time)
 {
     open_manipulator_msgs::SetJointPosition srv;
     srv.request.joint_position.joint_name = joint_name;
@@ -188,7 +166,7 @@ bool TROPICANA_TEST::setJointSpacePath(std::vector<std::string> joint_name, std:
     return false;
 }
 
-bool TROPICANA_TEST::setToolControl(std::vector<double> joint_angle)
+bool TROPICANA::setToolControl(std::vector<double> joint_angle)
 {
     open_manipulator_msgs::SetJointPosition srv;
     srv.request.joint_position.joint_name.push_back(node_handle_.param<std::string>("end_effector_name", "gripper"));
@@ -201,7 +179,7 @@ bool TROPICANA_TEST::setToolControl(std::vector<double> joint_angle)
     return false;
 }
 
-bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, double path_time)
+bool TROPICANA::setTaskSpacePath(std::vector<double> kinematics_pose, double path_time)
 {
     open_manipulator_msgs::SetKinematicsPose srv;
 
@@ -235,12 +213,12 @@ bool TROPICANA_TEST::setTaskSpacePath(std::vector<double> kinematics_pose, doubl
 }
 
 
-void TROPICANA_TEST::cutter_open(double path_time)
+void TROPICANA::cutter_open(double path_time)
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(0.01);
 
-    if (!TROPICANA_TEST::setToolControl(joint_angle))
+    if (!TROPICANA::setToolControl(joint_angle))
     {
         ROS_INFO("[ERR!!] Failed to send service");
         return;
@@ -250,12 +228,12 @@ void TROPICANA_TEST::cutter_open(double path_time)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::cutter_close(double path_time)
+void TROPICANA::cutter_close(double path_time)
 {
     std::vector<double> joint_angle;
     joint_angle.push_back(-0.01);
 
-    if (!TROPICANA_TEST::setToolControl(joint_angle))
+    if (!TROPICANA::setToolControl(joint_angle))
     {
         ROS_INFO("[ERR!!] Failed to send service");
         return;
@@ -265,7 +243,7 @@ void TROPICANA_TEST::cutter_close(double path_time)
     sleep(path_time);
 }
 
-// void TROPICANA_TEST::objectPublisher(void)
+// void TROPICANA::objectPublisher(void)
 // {
 //   std_msgs::String msg;
 //   msg.data = target_object.c_str();
@@ -273,7 +251,7 @@ void TROPICANA_TEST::cutter_close(double path_time)
 //   //ROS_INFO("send objectPublisher %s ", target_object.c_str());
 // }
 
-void TROPICANA_TEST::init_pose(double path_time)
+void TROPICANA::init_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
@@ -292,7 +270,7 @@ void TROPICANA_TEST::init_pose(double path_time)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::place_pose(double path_time)
+void TROPICANA::place_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
@@ -311,7 +289,7 @@ void TROPICANA_TEST::place_pose(double path_time)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::drop_pose(double path_time)
+void TROPICANA::drop_pose(double path_time)
 {
     std::vector<std::string> joint_name;
     std::vector<double> joint_angle;
@@ -330,7 +308,7 @@ void TROPICANA_TEST::drop_pose(double path_time)
     sleep(path_time);
 }
 
-void TROPICANA_TEST::process(void)
+void TROPICANA::process(void)
 {
     switch (task)
     {
@@ -386,21 +364,21 @@ void TROPICANA_TEST::process(void)
 int main(int argc, char **argv)
 {
   // Init ROS node
-    ros::init(argc, argv, "TROPICANA_TEST");
+    ros::init(argc, argv, "TROPICANA");
     ros::NodeHandle priv_nh("~");
 
-    TROPICANA_TEST tropicana_test_;
-    tropicana_test_.goalPose = tropicana_test_.getPresentKinematicsPose();
-    // tropicana_test_.init_pose();
+    TROPICANA tropicana_;
+    tropicana_.goalPose = tropicana_.getPresentKinematicsPose();
+    // tropicana_.init_pose();
     // sleep(2);
-    // tropicana_test_.goalPose.at(0) = 0.100 ;//x
-    // tropicana_test_.goalPose.at(1) = 0.000; //y
-    // tropicana_test_.goalPose.at(2) = 0.270 ; //z
-    // tropicana_test_.setTaskSpacePath(tropicana_test_.goalPose, 2);
+    // tropicana_.goalPose.at(0) = 0.100 ;//x
+    // tropicana_.goalPose.at(1) = 0.000; //y
+    // tropicana_.goalPose.at(2) = 0.270 ; //z
+    // tropicana_.setTaskSpacePath(tropicana_.goalPose, 2);
     // sleep(2);
-    // tropicana_test_.gripper_close();
+    // tropicana_.gripper_close();
     // sleep(2);
-    // tropicana_test_.gripper_open();
+    // tropicana_.gripper_open();
 
     ros::Rate loop_rate(25);
 
@@ -425,10 +403,10 @@ int main(int argc, char **argv)
                 break;
         }
 
-        tropicana_test_.process();
+        tropicana_.process();
         loop_rate.sleep();
     }
 
-    ROS_INFO("TROPICANA_TEST finished");
+    ROS_INFO("TROPICANA finished");
     return 0;
 }

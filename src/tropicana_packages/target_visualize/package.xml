@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>tropicana_test</name>
-  <version>1.0.0</version>
-  <description>The tropicana_test package for capstone design of hanyang university</description>
+  <name>target_visualize</name>
+  <version>0.0.0</version>
+  <description>The target_visualize package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="rkso2@hanyang.ac.kr">JIwon Kim</maintainer>
+  <maintainer email="rkso2@hanyang.ac.kr">Ji-Won Kim</maintainer>
+  <maintainer email="shkwon98@hanyang.ac.kr">Seong-Hyeon Kwon</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -19,13 +20,13 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/tropicana</url> -->
+  <!-- <url type="website">http://wiki.ros.org/point_visualization</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
   <!-- Authors do not have to be maintainers, but could be -->
   <!-- Example: -->
-  <author email="rkso2@hanyang.ac.kr">Jiwon Kim</author>
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
 
 
   <!-- The *depend tags are used to specify dependencies -->
@@ -49,17 +50,17 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>open_manipulator_msgs</build_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
   <build_depend>vision_msgs</build_depend>
-  <build_export_depend>open_manipulator_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>visualization_msgs</build_export_depend>
   <build_export_depend>vision_msgs</build_export_depend>
-  <exec_depend>open_manipulator_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
   <exec_depend>vision_msgs</exec_depend>
 
 

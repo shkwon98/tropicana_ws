@@ -1,9 +1,10 @@
-#ifndef TROPICANA_TEST_H
-#define TROPICANA_TEST_H
+#ifndef __TROPICANA_H
+#define __TROPICANA_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <termios.h>
+#include <math.h>
 
 #include "open_manipulator_msgs/SetJointPosition.h"
 #include "open_manipulator_msgs/SetKinematicsPose.h"
@@ -15,13 +16,24 @@
 
 #define NUM_OF_JOINT 4
 
-namespace tropicana_test
-{
 
-    class TROPICANA_TEST
+// Relative Position of D435i Camera from the Base of Manipulator
+const float x_offset = 0.0975;    // Unit : Meter, Degree
+const float y_offset = 0.0075;    // Unit : Meter
+const float z_offset = 0.0600;    // Unit : Meter
+const float deg_offset = 15.0;    // Unit : Degree
+const float rad_offset = deg_offset * M_PI / 180;
+
+const float y_gain = 1.75;
+const float cutter_z_offset = 0.05;
+
+
+namespace tropicana
+{
+    class TROPICANA
     {
     private:
-     // ROS NodeHandle
+        // ROS NodeHandle
         ros::NodeHandle node_handle_;
 
         ros::ServiceClient goal_joint_space_path_client_;
@@ -42,8 +54,8 @@ namespace tropicana_test
     public:
         bool flag;
         std::vector<double> goalPose;
-        TROPICANA_TEST();
-        ~TROPICANA_TEST();
+        TROPICANA();
+        ~TROPICANA();
 
         void initPublisher();
         void initSubscriber();
@@ -61,7 +73,7 @@ namespace tropicana_test
 
         void setGoal();
 
-      //  bool setToolControl(std::vector<double> joint_angle);
+        //  bool setToolControl(std::vector<double> joint_angle);
         void cutter_open(double);
         void cutter_close(double);
 
@@ -73,4 +85,4 @@ namespace tropicana_test
     };
 }
 
-#endif //TROPICANA_TEST_H
+#endif //__TROPICANA_H

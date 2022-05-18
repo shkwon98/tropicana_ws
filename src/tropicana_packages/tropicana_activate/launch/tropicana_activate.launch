@@ -8,7 +8,5 @@
   </include>-->
 
   <!-- manipulator control -->
-  <node pkg="tropicana_test" type="tropicana_test" name="tropicana_test"  output="screen"/> 
-  
-
+  <node pkg="tropicana_activate" type="tropicana_activate" name="tropicana_activate"  output="screen"/> 
 </launch>

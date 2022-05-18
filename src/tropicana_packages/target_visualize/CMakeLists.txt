@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(point_visualization)
+project(target_visualize)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -24,19 +24,20 @@ catkin_package(
 
 include_directories(
     include
+    ../tropicana_activate/include
     ${catkin_INCLUDE_DIRS}
 )
 
 
-add_executable(point_visualization_node 
-    src/point_visualization.cpp
+add_executable(target_visualize_node 
+    src/target_visualize.cpp
 )
 
-add_dependencies(point_visualization_node
-    ${point_visualization_node_EXPORTED_TARGETS} 
+add_dependencies(target_visualize_node
+    ${target_visualize_node_EXPORTED_TARGETS} 
     ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(point_visualization_node
+target_link_libraries(target_visualize_node
     ${catkin_LIBRARIES}
 )

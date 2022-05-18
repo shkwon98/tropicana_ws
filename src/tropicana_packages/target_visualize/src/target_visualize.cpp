@@ -1,7 +1,4 @@
-#include <ros/ros.h>
-#include <vision_msgs/Detection3DArray.h>
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
+#include "target_visualize.h"
 
 visualization_msgs::MarkerArray m_point_markers;
 
@@ -16,32 +13,27 @@ void point_sub_callback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 
     if (msg->detections.size() == 0)
     {
-        ROS_INFO("No obeject detected.");
+        ROS_INFO("No object detected.");
         return;
     }
 
     else
     {
-        const float x_offset = 0.0975;     //단위 : 미터
-        const float y_offset = 0.0075;
-        const float z_offset = 0.060;
-        const float pi = 3.1415926;
-        const float theta = 15.0 * pi / 180; //각도 측정 필요
-
         for (int i = 0; i < msg->detections.size(); i++)
         {
-            //point at camera coordinate
+            // Target point with respect to camera coordinate
             const float c_point_x = msg->detections.at(i).bbox.center.position.x;
             const float c_point_y = msg->detections.at(i).bbox.center.position.y;
             const float c_point_z = msg->detections.at(i).bbox.center.position.z;
-            //point at manipulator coordinate
-            const float m_point_x = cos(theta) * c_point_x - sin(theta) * c_point_z + x_offset;
-            const float m_point_y = c_point_y + y_offset * 1.75;
-            const float m_point_z = sin(theta) * c_point_x + cos(theta) * c_point_z + z_offset;
 
-            ROS_INFO("coord %d", i);
-            ROS_INFO("before translation :  %.3f, %.3f, %.3f  ", c_point_x, c_point_y, c_point_z);
-            ROS_INFO("after transformation : %.3f, %.3f, %.3f  ", m_point_x, m_point_y, m_point_z);
+            // Target point with respect to manipulator coordinate
+            const float m_point_x = cos(rad_offset) * c_point_x - sin(rad_offset) * c_point_z + x_offset;
+            const float m_point_y = c_point_y + y_offset * y_gain;
+            const float m_point_z = sin(rad_offset) * c_point_x + cos(rad_offset) * c_point_z + z_offset;
+
+            ROS_INFO("Target %d", i);
+            ROS_INFO("Before transformation :  %.3f, %.3f, %.3f  ", c_point_x, c_point_y, c_point_z);
+            ROS_INFO("After transformation : %.3f, %.3f, %.3f  ", m_point_x, m_point_y, m_point_z);
 
             visualization_msgs::Marker marker;
             marker.header.frame_id = "world";
@@ -74,9 +66,9 @@ void point_sub_callback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 int main(int argc, char** argv)
 {
 
-    ros::init(argc, argv, "point_visualization_node");
+    ros::init(argc, argv, "target_visualize_node");
     ros::NodeHandle nh;
-    ROS_INFO("==== Point visualization node is started\n");
+    ROS_INFO("==== Target visualize node is started\n");
 
     ros::Subscriber point_sub = nh.subscribe("/detection_3d/detection_3d", 1, point_sub_callback);
     ros::Publisher transformed_point_pub = nh.advertise<visualization_msgs::MarkerArray>("/transformed_point", 5);
