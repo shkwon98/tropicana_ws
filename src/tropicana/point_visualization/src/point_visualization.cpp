@@ -22,11 +22,11 @@ void point_sub_callback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 
     else
     {
-        const float x_offset = 0.00;     //단위 : 미터
-        const float y_offset = -0.06;
-        const float z_offset = 0.02;
+        const float x_offset = 0.0975;     //단위 : 미터
+        const float y_offset = 0.0075;
+        const float z_offset = 0.060;
         const float pi = 3.1415926;
-        const float theta = 0.0 * pi / 180; //각도 측정 필요
+        const float theta = 15.0 * pi / 180; //각도 측정 필요
 
         for (int i = 0; i < msg->detections.size(); i++)
         {
@@ -35,8 +35,8 @@ void point_sub_callback(const vision_msgs::Detection3DArray::ConstPtr &msg)
             const float c_point_y = msg->detections.at(i).bbox.center.position.y;
             const float c_point_z = msg->detections.at(i).bbox.center.position.z;
             //point at manipulator coordinate
-            const float m_point_x = cos(theta) * c_point_x - sin(theta) * c_point_z + 0.03;
-            const float m_point_y = c_point_y + y_offset * 1.5;
+            const float m_point_x = cos(theta) * c_point_x - sin(theta) * c_point_z + x_offset;
+            const float m_point_y = c_point_y + y_offset * 1.75;
             const float m_point_z = sin(theta) * c_point_x + cos(theta) * c_point_z + z_offset;
 
             ROS_INFO("coord %d", i);
