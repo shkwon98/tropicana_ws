@@ -216,7 +216,7 @@ bool TROPICANA::setTaskSpacePath(std::vector<double> kinematics_pose, double pat
 void TROPICANA::cutter_open(double path_time)
 {
     std::vector<double> joint_angle;
-    joint_angle.push_back(0.01);
+    joint_angle.push_back(0.0105);
 
     if (!TROPICANA::setToolControl(joint_angle))
     {

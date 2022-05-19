@@ -28,7 +28,7 @@ void point_sub_callback(const vision_msgs::Detection3DArray::ConstPtr &msg)
 
             // Target point with respect to manipulator coordinate
             const float m_point_x = cos(rad_offset) * c_point_x - sin(rad_offset) * c_point_z + x_offset;
-            const float m_point_y = c_point_y + y_offset * y_gain;
+            const float m_point_y = (c_point_y + y_offset) * y_gain;
             const float m_point_z = sin(rad_offset) * c_point_x + cos(rad_offset) * c_point_z + z_offset;
 
             ROS_INFO("Target %d", i);

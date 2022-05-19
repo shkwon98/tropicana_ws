@@ -8,5 +8,5 @@
   </include>-->
 
   <!-- manipulator control -->
-  <node pkg="tropicana_activate" type="tropicana_activate" name="tropicana_activate"  output="screen"/> 
+  <node pkg="tropicana_activate" type="tropicana_activate_node" name="tropicana_activate"  output="screen"/> 
 </launch>
