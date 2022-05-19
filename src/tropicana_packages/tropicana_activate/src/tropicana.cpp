@@ -209,6 +209,10 @@ bool TROPICANA::setTaskSpacePath(std::vector<double> kinematics_pose, double pat
     {
         return srv.response.is_planned;
     }
+    if (!srv.response.is_planned)
+    {
+        task = INIT_POSITION;
+    }
     return false;
 }
 
