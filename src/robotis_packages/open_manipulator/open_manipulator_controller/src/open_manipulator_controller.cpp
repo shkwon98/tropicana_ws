@@ -335,9 +335,16 @@ bool OpenManipulatorController::goalTaskSpacePathPositionOnlyCallback(open_manip
   position[1] = req.kinematics_pose.pose.position.y;
   position[2] = req.kinematics_pose.pose.position.z;
 
-  open_manipulator_.makeTaskTrajectory(req.end_effector_name, position, req.path_time);
+  if(open_manipulator_.makeTaskTrajectory(req.end_effector_name, position, req.path_time))
+  {
+    res.is_planned = true;
+  }
 
-  res.is_planned = true;
+  else
+  {
+    res.is_planned = false;  
+  }
+  
   return true;
 }
 
