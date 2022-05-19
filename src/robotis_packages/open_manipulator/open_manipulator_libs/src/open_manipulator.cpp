@@ -82,7 +82,7 @@ void OpenManipulator::initOpenManipulator(bool using_actual_robot_state, STRING 
             math::vector3(0.126, 0.0, 0.0),                 // relative position
             math::convertRPYToRotationMatrix(0.0, 0.0, 0.0), // relative orientation
             15,         // actuator id
-            0.018,      // max gripper limit (0.011 m)
+            0.018,      // max gripper limit (0.018 m)
             -0.010,     // min gripper limit (-0.01 m)
             -0.015);    // Change unit from `meter` to `radian`
 
