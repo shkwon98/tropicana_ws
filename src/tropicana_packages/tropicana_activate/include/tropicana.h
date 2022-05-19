@@ -18,14 +18,14 @@
 
 
 // Relative Position of D435i Camera from the Base of Manipulator
-const float x_offset = 0.0975;    // Unit : Meter, Degree
+const float x_offset = 0.0900;    // Unit : Meter, Degree
 const float y_offset = 0.0075;    // Unit : Meter
 const float z_offset = 0.0600;    // Unit : Meter
 const float deg_offset = 15.0;    // Unit : Degree
 const float rad_offset = deg_offset * M_PI / 180;
 
 const float y_gain = 1.75;
-const float cutter_z_offset = 0.05;
+const float cutter_z_offset = 0.055;
 
 
 namespace tropicana
